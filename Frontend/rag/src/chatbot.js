@@ -1,24 +1,54 @@
 import React, { useState } from 'react';
 
+
+
 const Chatbot = () => {
   const [messages, setMessages] = useState([
     { text: 'Welcome! How can I help you?', isUser: false },
   ]);
   const [input, setInput] = useState('');
+  // const [isLoading, setIsLoading] = useState(true);
+
+  const callAPI = async (question_input) => {
+    const apiUrl = 'http://0.0.0.0:4242/inference';
+    const data = {'text': question_input};
+    // let answerObj = {};
+    // console.log(answerObj)
+  
+    try {
+      const response = await fetch(apiUrl, {method: 'POST',
+                                            headers: {'Content-Type': 'application/json'},
+                                            body: JSON.stringify(data)});
+  
+      if (!response.ok) {throw new Error('No 200');}
+  
+      const answerObj = await response.json();
+      console.log('Response data:', answerObj);
+
+      setMessages(
+        [
+        ...messages,
+        { text: input, isUser: true },
+        {text: answerObj.content, isUser:false},
+      ]);
+    } 
+    
+    catch (error) {
+      console.error('Error in POST:', error);
+    }
+
+
+  }; // end call api
+
 
   const handleInput = (e) => {
     setInput(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    await callAPI(e)
     if (!input) return;
-
-    setMessages([
-      ...messages,
-      { text: input, isUser: true },
-      { text: 'Your message: ' + input, isUser: false }, // Replace this with your bot logic
-    ]);
     setInput('');
   };
 

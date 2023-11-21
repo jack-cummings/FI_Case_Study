@@ -9,15 +9,14 @@ import numpy as np
 
 question= 'what is the significance of german sailors to the hamburger'
 
-def call_embedding(text):
+def call_embedding(client, text):
     embedding = client.embeddings.create(model="text-embedding-ada-002",input = [text.replace("\n"," ")]).data[0].embedding
     return embedding
 
-def query_db(question):
+def query_db(client, question):
     # prepare question
-    embedding = call_embedding(question)
-    #array = np.array(embedding)
-    #print(array)
+    embedding = call_embedding(client, question)
+
 
     #connect to db
     con_str= os.environ['pg_conn_str']
@@ -30,9 +29,8 @@ def query_db(question):
     docs = cur.fetchall()
     return docs
 
-def generate_rep(docs):
-    # print(f'context: {docs[0][0]} \n {docs[1][0]} {docs[2][0]}')
-    print(f'url: {docs[0][1]} \n {docs[1][1]} {docs[2][1]}')
+def generate_rep(client, docs):
+    #print(f'url: {docs[0][1]} \n {docs[1][1]} {docs[2][1]}')
     context = """You are a chatbot, highly skilled in foods, cooking and resturants. You provide consice, accurate 
         responses to questions from users. If you do not know the answer to a question, 
         you say that you do not know, you do not make up an answer."""
@@ -50,5 +48,14 @@ def generate_rep(docs):
     # print(response)
     return response.choices[0].message.content
 
-client = OpenAI()
-print(generate_rep(query_db(question)))
+def get_answer(question):
+    client = OpenAI()
+    docs = query_db(client, question)
+    answer = generate_rep(client, docs)
+    print('t')
+    urls = [set([x[1] for x in docs])]
+    contexts = [set([x[0] for x in docs])]
+    print('here')
+    return {'content':answer, 'context':contexts[0], 'urls': urls}
+
+#print(get_answer(question))
