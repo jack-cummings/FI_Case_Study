@@ -4,7 +4,7 @@ const Chatbot = () => {
   const [messages, setMessages] = useState([{ text: 'Welcome! How can I help you?', isUser: false }]);
   const [input, setInput] = useState('');
   const [context_window, setContextWindow] = useState('Your Context will apear here, use the chat to continue!')
-  const [documents, setDocuments] = useState('')
+  const [documents, setDocuments] = useState([{urls:''}])
   // const [isLoading, setIsLoading] = useState(true);
 
   const callAPI = async (question_input) => {
@@ -44,9 +44,9 @@ const Chatbot = () => {
       { text: input, isUser: true },
       {text: answerObj.content, isUser:false},
     ]);
-    console.log(answerObj.context)
     setContextWindow(answerObj.context)
-    console.log(context_window)
+    setDocuments([{urls:answerObj.url}])
+    console.log(documents)
     setInput('');
   };
 
@@ -74,21 +74,15 @@ const Chatbot = () => {
       </div>
 
       <div className="middle-panel">
+        <h1>Context Window</h1>
         <div className="scrollable-content">
-          {/* {Array.from({ length: 50 }, (_, i) => (
-            <p key={i}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-              incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-              exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-            </p>
-          ))} */}
           <p>{context_window}</p>
         </div>
       </div>
 
       <div className="file-explorer">
-        {/* Windows File Explorer-like view */}
-        {/* Implement the file explorer content here */}
+      {documents.map((doc, index) => (
+      <div key={index} className='file-object'> {doc.urls}</div>))}
       </div>
     </div>
   );
