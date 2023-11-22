@@ -1,19 +1,16 @@
 import React, { useState } from 'react';
 
-
-
 const Chatbot = () => {
-  const [messages, setMessages] = useState([
-    { text: 'Welcome! How can I help you?', isUser: false },
-  ]);
+  const [messages, setMessages] = useState([{ text: 'Welcome! How can I help you?', isUser: false }]);
   const [input, setInput] = useState('');
+  const [context_window, setContextWindow] = useState('Your Context will apear here, use the chat to continue!')
+  const [documents, setDocuments] = useState('')
   // const [isLoading, setIsLoading] = useState(true);
 
   const callAPI = async (question_input) => {
     const apiUrl = 'http://0.0.0.0:4242/inference';
     const data = {'text': question_input};
-    // let answerObj = {};
-    // console.log(answerObj)
+    console.log(JSON.stringify(data))
   
     try {
       const response = await fetch(apiUrl, {method: 'POST',
@@ -24,21 +21,12 @@ const Chatbot = () => {
   
       const answerObj = await response.json();
       console.log('Response data:', answerObj);
-
-      setMessages(
-        [
-        ...messages,
-        { text: input, isUser: true },
-        {text: answerObj.content, isUser:false},
-      ]);
+      return answerObj
     } 
     
     catch (error) {
       console.error('Error in POST:', error);
-    }
-
-
-  }; // end call api
+    }}; // end call api
 
 
   const handleInput = (e) => {
@@ -47,10 +35,21 @@ const Chatbot = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await callAPI(e)
     if (!input) return;
+    console.log(input)
+    const answerObj = await callAPI(input)
+    setMessages(
+      [
+      ...messages,
+      { text: input, isUser: true },
+      {text: answerObj.content, isUser:false},
+    ]);
+    console.log(answerObj.context)
+    setContextWindow(answerObj.context)
+    console.log(context_window)
     setInput('');
   };
+
 
   return (
     <div className="layout-container">
@@ -75,16 +74,15 @@ const Chatbot = () => {
       </div>
 
       <div className="middle-panel">
-        {/* Scrollable content */}
         <div className="scrollable-content">
-          {/* Lorem Ipsum text for demonstration */}
-          {Array.from({ length: 50 }, (_, i) => (
+          {/* {Array.from({ length: 50 }, (_, i) => (
             <p key={i}>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
               incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
               exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
             </p>
-          ))}
+          ))} */}
+          <p>{context_window}</p>
         </div>
       </div>
 
@@ -97,3 +95,5 @@ const Chatbot = () => {
 };
 
 export default Chatbot;
+
+
