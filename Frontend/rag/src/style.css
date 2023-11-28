@@ -15,7 +15,7 @@ body {
 
 /* Chatbot container */
 .chatbot {
-  max-width: 400px;
+  max-width: 600px;
   margin: 0 auto;
 }
 
@@ -26,8 +26,8 @@ body {
   padding: 10px;
 }
 
-.user-message {
-  background-color: #3f3f3f; /* Darker color for user messages */
+.bot-message {
+  background-color: #3f3f3f; /* Grey for bot messages */
   color: #fff;
   padding: 8px;
   margin-bottom: 10px;
@@ -35,13 +35,15 @@ body {
   align-self: flex-end;
 }
 
-.bot-message {
-  background-color: #009688; /* Green color for bot messages */
+.user-message {
+  background-color: #009688; /* Green for user messages */
   color: #fff;
   padding: 8px;
   margin-bottom: 10px;
   border-radius: 5px;
+  /* padding-left: 15px; */
   align-self: flex-start;
+  text-align: left;
 }
 
 /* Chat input form */
@@ -50,7 +52,8 @@ body {
   margin-top: 20px;
 }
 
-input[type='text'] {
+
+/* input[type='text'] {
   flex: 1;
   padding: 8px;
   border: none;
@@ -60,6 +63,20 @@ input[type='text'] {
 
 input[type='text']:focus {
   outline: none;
+} */
+
+textarea {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 5px;
+  margin-right: 10px;
+  resize: vertical; /* Allow vertical resizing */
+  overflow-y: auto; /* Show scrollbar when content exceeds the height */
+  min-height: 40px; /* Set a minimum height */
+  max-height: 200px; /* Set a maximum height if needed */
+  box-sizing: border-box; /* Include padding and border in the height */
+  word-wrap: break-word; /* Allow word wrapping */
 }
 
 button {
@@ -95,29 +112,29 @@ button:hover {
   }
   
   /* Chat messages styles */
-  .chatbot-messages {
+  /* .chatbot-messages {
     max-height: 300px;
     overflow-y: auto;
     padding: 10px;
-  }
+  } */
   
-  .user-message {
-    background-color: #3f3f3f; /* Darker color for user messages */
-    color: #fff;
+  /* .user-message {
+    background-color: #3f3f3f; Darker color for user messages */
+    /* color: #fff;
     padding: 8px;
     margin-bottom: 10px;
     border-radius: 5px;
     align-self: flex-end;
   }
-  
-  .bot-message {
-    background-color: #009688; /* Green color for bot messages */
+   */
+  /* .bot-message {
+    background-color: #009688; /* Green color for bot messages
     color: #fff;
     padding: 8px;
     margin-bottom: 10px;
     border-radius: 5px;
     align-self: flex-start;
-  }
+  } */
   
   /* Chat input form */
   .chatbot-form {
@@ -172,6 +189,29 @@ button:hover {
     overflow-y: auto; /* Enable scrolling */
     padding: 20px;
   }
+
+  .context-window {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* .context-window::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 20%, rgba(255, 255, 255, 1) 80%, rgba(255, 255, 255, 0) 100%);
+    filter: blur(10px); 
+    z-index: 1;
+  }
+  
+
+  .context-window > * {
+    position: relative;
+    z-index: 2;
+  } */
   
   /* File explorer */
   .file-explorer {
@@ -180,4 +220,60 @@ button:hover {
     color: #fff;
     padding: 20px;
     overflow-y: auto;
+    gap: 30px;
+  }
+
+  .file-object{
+    background-color: #7CB9E8; /* light blue */
+    color: #fff;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    align-self: flex-start;
+  }
+
+  .container {
+    margin-top: 20px;
+    width: 100%;
+    height: 20px;
+    /* background-color: lightblue; */
+  }
+
+  .collapsible-list {
+    max-width: 400px; /* Adjust the maximum width as needed */
+    margin: 0 auto;
+  }
+  
+  .collapsible-item {
+    border: 1px solid #7CB9E8;
+    margin-bottom: 10px;
+  }
+  
+  .item-header {
+    background-color: #7CB9E8;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .item-content {
+    padding: 10px;
+    display: none;
+  }
+  
+  .item-content p {
+    margin-bottom: 5px;
+  }
+  
+  .nested-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .nested-list li {
+    margin-left: 20px;
+  }
+  
+  .collapsible-item.active .item-content {
+    display: block;
   }
