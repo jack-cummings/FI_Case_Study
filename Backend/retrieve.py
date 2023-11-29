@@ -40,9 +40,10 @@ def query_db(client, question):
 
 def generate_rep(client, docs, question):
     #print(f'url: {docs[0][1]} \n {docs[1][1]} {docs[2][1]}')
-    context = """You are a chatbot, highly skilled in foods, cooking and resturants. You provide consice, accurate 
-        responses to questions from users. If you do not know the answer to a question, 
-        you say that you do not know, you do not make up an answer."""
+    context = """You are a chatbot, highly skilled in foods, cooking and resturants. 
+                You provide consice, accurate responses to questions from users. 
+                The information provided as "relevant information" superseeds that from your training.
+                If you do not know the answer to a question, you say that you do not know, you do not make up an answer."""
     
     delimiter = "```"
 

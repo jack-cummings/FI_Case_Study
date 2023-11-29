@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect} from 'react';
 
 const Chatbot = () => {
-  const [messages, setMessages] = useState([{ text: 'Welcome! How can I help you?', isUser: false }]);
+  const [messages, setMessages] = useState([{ text: 'Welcome! How can I help you?', isUser: false, isLoading: false }]);
   const [input, setInput] = useState('');
   const [context_window, setContextWindow] = useState('Your Context will apear here, use the chat to continue!')
-  const [documents, setDocuments] = useState([])
+  const [documents, setDocuments] = useState([{urls: ['Your documents will apear here']},{urls: ['Use the chat to continue!']}])
   const [title, setTitle] = useState()
   const [focus_text, setFocusText] = useState('')
 
@@ -85,12 +85,18 @@ const Chatbot = () => {
     e.preventDefault();
     if (!input) return;
     console.log(input)
+    setInput('');
+    setMessages([
+      ...messages,
+      { text: input, isUser: true, isLoading: false },
+      { text: 'thinking', isUser: false, isLoading: true }
+    ])
     const answerObj = await callAPI(input)
     setMessages(
       [
       ...messages,
-      { text: input, isUser: true },
-      {text: answerObj.content, isUser:false},
+      { text: input, isUser: true, isLoading: false },
+      {text: answerObj.content, isUser:false, isLoading: false},
     ]);
     setContextWindow(answerObj.full_text)
     setDocuments([
@@ -98,7 +104,6 @@ const Chatbot = () => {
       {urls:answerObj.urls}
     ])
     console.log(documents)
-    setInput('');
     setTitle(answerObj.urls);
     setFocusText(answerObj.context[0]);
   };
@@ -112,10 +117,22 @@ const Chatbot = () => {
         <div className="chatbot-messages-container">
           <div className="chatbot-messages">
           {messages.map((msg, index) => (
-            <div key={index} className={msg.isUser ? 'user-message' : 'bot-message'}>
-              {msg.text}
-            </div>
-          ))}
+              <div key={index} className={msg.isUser ? 'user-message' : 'bot-message'}>
+              {msg.isLoading === false ? (
+                  <div>{msg.text}</div>
+              ) : (
+                <div>
+                  <small>Retrieving Information</small>
+                 <div className="typing-animation">
+                  <span>.</span>
+                  <span>.</span>
+                  <span>.</span>
+                </div>
+              </div>
+              )
+              }
+          </div>
+            ))}
         </div>
         <form onSubmit={handleSubmit} className="chatbot-form">
           <textarea
@@ -132,9 +149,8 @@ const Chatbot = () => {
 
       <div className="middle-panel">
         <h1>Review</h1>
-        <p>Review the relvent source doucmentation, ensureing the chat response,</p>
+        <p>Review the relvent source doucmentation</p>
         <div className="context-window">
-          {/* <p>{context_window}</p> */}
           <div>
             <h3>{title}</h3><br></br>
             <StyledSubstring
@@ -149,15 +165,15 @@ const Chatbot = () => {
       </div>
 
       <div className="file-explorer">
-        <h1>Refference</h1>
-        <p>Keep Track for Later</p>
+        <h1>Revisit</h1>
+        <p>Visit the documents you previosly viewd</p>
       <div className='file-explorer-container'>
       {documents.map((doc, index) => (
-      <div className='container'><div><a href={doc.urls} key={index} className='file-object'> {doc.urls}</a></div></div>))}
+      <div className='container'><div><a href={doc.urls[0]} key={index} className='file-object'> {doc.urls[0]}</a></div></div>))}
       </div>
       </div>
-      
     </div>
+    
   );
 };
 
