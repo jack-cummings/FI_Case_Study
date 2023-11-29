@@ -24,7 +24,16 @@ def query_db(client, question):
     cur = conn.cursor()
 
     # Get top 3 docs by cosign simantic sim
-    sql = "SELECT content,url FROM vector_store ORDER BY embedding <=> %s LIMIT 3"
+    sql = """SELECT 
+                vec.content
+                ,doc.url 
+                ,doc.content
+            FROM 
+                vector_store vec
+            INNER JOIN doc_store doc
+                on vec.doc_id=doc.doc_id
+            ORDER BY vec.embedding <=> %s 
+            LIMIT 3"""
     cur.execute(sql, (str(embedding),))
     docs = cur.fetchall()
     return docs
@@ -56,6 +65,7 @@ def get_answer(question):
     answer = generate_rep(client, docs, question)
     urls = [set([x[1] for x in docs])]
     contexts = [set([x[0] for x in docs])]
-    return {'content':answer, 'context':contexts[0], 'urls': urls}
+    texts = [set([x[2] for x in docs])]
+    return {'content':answer, 'context':contexts[0], 'urls': urls, 'full_text':texts[0]}
 
 #print(get_answer(question))

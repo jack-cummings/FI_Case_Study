@@ -5,6 +5,8 @@ const Chatbot = () => {
   const [input, setInput] = useState('');
   const [context_window, setContextWindow] = useState('Your Context will apear here, use the chat to continue!')
   const [documents, setDocuments] = useState([])
+  const [title, setTitle] = useState()
+  const [focus_text, setFocusText] = useState('')
 
 
   // const [isLoading, setIsLoading] = useState(true);
@@ -39,9 +41,12 @@ const Chatbot = () => {
       raw = full_text.split(substring)
     }
     else {
-      raw = full_text.split(substring)
+      const doc_text = full_text[0]
+      console.log('here')
+      console.log(doc_text)
+      raw = doc_text.split(substring)
       raw.splice(1,0,substring)
-      console.log('hit')
+      console.log(raw)
       
     }
 
@@ -87,25 +92,25 @@ const Chatbot = () => {
       { text: input, isUser: true },
       {text: answerObj.content, isUser:false},
     ]);
-    setContextWindow(answerObj.context)
-    // const focus_text = 'A taco'
-    // // const ProcessedContext = await processContext(focus_text,answerObj.context)
-    // const ProcessedContext = await HighlightedSubstring(answerObj.context,focus_text)
-    // setContextWindow(ProcessedContext)
+    setContextWindow(answerObj.full_text)
     setDocuments([
       ...documents,
-      {urls:answerObj.url}
+      {urls:answerObj.urls}
     ])
+    console.log(documents)
     setInput('');
+    setTitle(answerObj.urls);
+    setFocusText(answerObj.context[0]);
   };
-
 
   return (
     <div className="layout-container">
       <div className="chatbot">
         {/* Chatbot window */}
-        <h1>Chatbot</h1>
-        <div className="chatbot-messages">
+        <h1>Ask</h1>
+        <p>Ask a question related to your coulinary needs</p>
+        <div className="chatbot-messages-container">
+          <div className="chatbot-messages">
           {messages.map((msg, index) => (
             <div key={index} className={msg.isUser ? 'user-message' : 'bot-message'}>
               {msg.text}
@@ -115,37 +120,42 @@ const Chatbot = () => {
         <form onSubmit={handleSubmit} className="chatbot-form">
           <textarea
             type="text"
-            placeholder="Type a message..."
+            placeholder="Type your question here..."
             value={input}
             onChange={handleInput}
           />
           <button type="submit">Send</button>
         </form>
+        </div>
       </div>
+      
 
       <div className="middle-panel">
-        <h1>Context Window</h1>
+        <h1>Review</h1>
+        <p>Review the relvent source doucmentation, ensureing the chat response,</p>
         <div className="context-window">
           {/* <p>{context_window}</p> */}
           <div>
-            <h1>Styled Substring</h1>
+            <h3>{title}</h3><br></br>
             <StyledSubstring
               full_text={context_window}
-              substring= 'These instances predate the theory that the first mention of the word "taco" in Mexico was in the 1891 novel Los bandidos de Río Frío by Manuel Payno.'
-              substringStyle={{ fontWeight: 'bold', color: '#009688' }}
-              defaultStyle={{ fontWeight: 'normal', color: 'white' }}
+              substring= {focus_text}
+              substringStyle={{fontWeight: 'bold', color: '#009688', backgroundColor: '#333'}}
+              defaultStyle={{fontWeight: 'normal', color: 'white' }}
             />
           </div>
-
+          {/* <iframe src="https://en.wikipedia.org/wiki/Boston_Red_Sox#:~:text=The%20Red%20Sox%20were%20a%20dominant%20team%20in%20the%20new%20league%2C"></iframe> */}
         </div>
       </div>
 
       <div className="file-explorer">
-        <h1>Document History</h1>
+        <h1>Refference</h1>
+        <p>Keep Track for Later</p>
+      <div className='file-explorer-container'>
       {documents.map((doc, index) => (
       <div className='container'><div><a href={doc.urls} key={index} className='file-object'> {doc.urls}</a></div></div>))}
       </div>
-
+      </div>
       
     </div>
   );
