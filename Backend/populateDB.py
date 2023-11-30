@@ -32,7 +32,6 @@ def extract_text(input_list):
     # Initialize connection to WIKI API
     wiki_wiki = wikipediaapi.Wikipedia('jc_personal', 'en')
     
-    # df = pd.DataFrame(input_list,columns=['ID'])
     corpus = []
     for item in input_list:
         try:
@@ -45,12 +44,6 @@ def extract_text(input_list):
         except:
             print('failed: {item}')
             # as we are simply populating corpus, missing wikis can be ignored
-
-        # page = wiki_wiki.page(item)
-        # item_text = page.text
-        # item_url = page.fullurl
-        # corpus.append([item.replace(' ','_'),item_text,item_url])
-        # print('success')
                  
     
     df = pd.DataFrame(corpus,columns=['ID','Url','Text'])
@@ -58,13 +51,16 @@ def extract_text(input_list):
     return df
 
 def write_corpus_df(df):
+    '''
+    Function to initialize and populate the document table of the database.
+    Columns: doc_id, URL, content (of document)
+    '''
     # Conenct to DB
     con_str= os.environ['pg_conn_str']
     conn = psycopg2.connect(con_str)
     cur = conn.cursor()
 
     # init table
-    #  , 
     init_table = """
     DROP TABLE IF EXISTS doc_store;
     CREATE TABLE doc_store (
@@ -95,7 +91,7 @@ def chunk_texts(df):
     This is high resolution, optimized for accuracy over efficiency"""
     # Use Langchain text splitters to create windowed doc chunks of length 1000
     # text_splitter = CharacterTextSplitter(separator = "\n", chunk_size = 1000, chunk_overlap  = 200, length_function = len, is_separator_regex = False)
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=50, separators=[" ", ",", "\n"])
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50, separators=["\n\n", "\n"," ", ","])
 
     chunks_corpus= []
     for i in range(len(df)):
@@ -108,6 +104,10 @@ def chunk_texts(df):
             chunks_corpus.append([f'{name}_{pos}',chunk,url,name])
     
     chunks_df = pd.DataFrame(chunks_corpus, columns=['chunk_id','Text','Url','doc_id'])
+    init_rows = chunks_df.shape[0]
+    chunks_df.drop_duplicates(subset='chunk_id',inplace=True)
+    final_rows = chunks_df.shape[0]
+    print('duplicate rows dropped: {final_rows}-{init_rows}')
     return chunks_df
 
 def call_embedding(text):
